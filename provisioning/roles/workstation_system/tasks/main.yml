@@ -1,0 +1,2 @@
+- name: whoami in the role
+  raw: whoami

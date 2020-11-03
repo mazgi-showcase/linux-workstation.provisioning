@@ -9,26 +9,39 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: |
-          cat<<EOE > .env
-          AWS_ACCOUNT_ID=YOUR_AWS_ACCOUNT_ID
-          CLOUDSDK_CORE_PROJECT=YOUR_GCP_PROJECT_ID
-          CURRENT_ENV_NAME=production
-          PROJECT_UNIQUE_ID=YOUR_GCP_PROJECT_UNIZUE_ID
+          cat<<EOE > .test.env
+          CURRENT_ENV_NAME=test
           EOE
       - run: |
-          echo "UID=$(id -u)" >> .env
-          echo "GID=$(id -g)" >> .env
-      # - run: |
-      #     echo "AWS_ACCESS_KEY_ID=${PROVISIONING_AWS_ACCESS_KEY_ID}" >> .env
-      #     echo "AWS_SECRET_ACCESS_KEY=${PROVISIONING_AWS_SECRET_ACCESS_KEY}" >> .env
-      #     echo ${PROVISIONING_GOOGLE_SA_KEY} > config/$(grep -e '^\s*CURRENT_ENV_NAME\s*=' .env | sed -e 's/CURRENT_ENV_NAME=//')/credentials/google-cloud-keyfile.json
-      #   env:
-      #     PROVISIONING_AWS_ACCESS_KEY_ID: ${{ secrets.PROVISIONING_AWS_ACCESS_KEY_ID }}
-      #     PROVISIONING_AWS_SECRET_ACCESS_KEY: ${{ secrets.PROVISIONING_AWS_SECRET_ACCESS_KEY }}
-      #     PROVISIONING_GOOGLE_SA_KEY: ${{ secrets.PROVISIONING_GOOGLE_SA_KEY }}
-      # - run: docker-compose build
-      # - run: docker-compose up
-      # - run: docker-compose run provisioning terraform fmt -check
-      # - run: docker-compose run provisioning terraform plan
-      # - run: docker-compose run provisioning terraform apply -auto-approve
-      #   if: github.ref == 'refs/heads/main'
+          echo "UID=$(id -u)" >> .test.env
+          echo "GID=$(id -g)" >> .test.env
+      - name: set up ssh credentials for testing
+        run: |
+          mkdir -p ${HOME}/.ssh/
+          ssh-keygen -C '' -f ${HOME}/.ssh/id_rsa -N ''
+          ls -al ${HOME}/.ssh/
+      - name: docker-compose build
+        run: |
+          docker-compose\
+           --env-file .test.env\
+           --file docker-compose.yml\
+           --file docker-compose.test-stub.yml\
+           build
+      - name: (test-stub) docker-compose up
+        run: |
+          docker-compose\
+           --env-file .test.env\
+           --file docker-compose.test-stub.yml\
+           up --detach
+      - name: docker-compose up
+        run: |
+          docker-compose\
+           --env-file .test.env\
+           --file docker-compose.yml\
+           up
+      - name: docker-compose run
+        run: |
+          docker-compose\
+           --env-file .test.env\
+           --file docker-compose.yml\
+           run provisioning ansible-playbook site.yml
