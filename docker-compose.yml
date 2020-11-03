@@ -6,38 +6,25 @@ services:
       args:
         UID: ${UID:-0}
         GID: ${GID:-0}
-    # command:
-    #   - zsh
-    #   - -ic
-    #   - |
-    #     /project/scripts/provisioning.init-with-google.sh
+    command:
+      - zsh
+      - -ic
+      - |
+        echo ln -fs /project/config/$${CURRENT_ENV_NAME}/ansible.cfg $${HOME}/.ansible.cfg
     environment:
-      - AWS_ACCESS_KEY_ID
-      - AWS_ACCOUNT_ID
-      - AWS_SECRET_ACCESS_KEY
-      - CURRENT_ENV_NAME
-      - CLOUDSDK_CORE_PROJECT
-      - GOOGLE_APPLICATION_CREDENTIALS=/project/config/${CURRENT_ENV_NAME}/credentials/google-cloud-keyfile.json
-      - PROJECT_UNIQUE_ID
-      - TF_DATA_DIR=/tmp/provisioning
-      - TF_VAR_aws_access_key=${AWS_ACCESS_KEY_ID}
-      - TF_VAR_aws_secret_key=${AWS_SECRET_ACCESS_KEY}
-      - TF_VAR_gcp_project_id=${CLOUDSDK_CORE_PROJECT}
-      - TF_VAR_project_unique_id=${PROJECT_UNIQUE_ID}
+      ANSIBLE_CONFIG: /project/config/${CURRENT_ENV_NAME}/ansible.cfg
+      CURRENT_ENV_NAME:
     user: "${UID:-0}:${GID:-0}"
     volumes:
-      - provisioning-tmp:/tmp/provisioning
       - provisioning-home-root:/root # for macOS
       - provisioning-home-developer:/home/developer
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./Dockerfile.d:/project/Dockerfile.d
+      - ${HOME}/.ssh:/root/.ssh:ro # for macOS
+      - ${HOME}/.ssh:/developer/.ssh:ro
       - ./config:/project/config
       - ./provisioning:/project/workspace
-      - ./scripts:/project/scripts
     working_dir: /project/workspace
 volumes:
-  provisioning-tmp:
-    driver: local
   provisioning-home-root:
     driver: local
   provisioning-home-developer:
