@@ -10,7 +10,7 @@ services:
       - zsh
       - -ic
       - |
-        echo ln -fs /project/config/$${CURRENT_ENV_NAME}/ansible.cfg $${HOME}/.ansible.cfg
+        ansible-galaxy install -r requirements.yml
     environment:
       ANSIBLE_CONFIG: /project/config/${CURRENT_ENV_NAME}/ansible.cfg
       CURRENT_ENV_NAME:

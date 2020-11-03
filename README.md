@@ -35,7 +35,7 @@ docker-compose up
 
 ```shellsession
 docker-compose run provisioning ansible --module-name ping all
-docker-compose run provisioning ansible-playbook site.yml
+docker-compose run provisioning ansible-playbook --ask-become-pass site.yml
 ```
 
 ## Links
