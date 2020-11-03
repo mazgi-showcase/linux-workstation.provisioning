@@ -19,7 +19,6 @@ jobs:
         run: |
           mkdir -p ${HOME}/.ssh/
           ssh-keygen -C '' -f ${HOME}/.ssh/id_rsa -N ''
-          ls -al ${HOME}/.ssh/
       - name: docker-compose build
         run: |
           docker-compose\
@@ -45,3 +44,4 @@ jobs:
            --env-file .test.env\
            --file docker-compose.yml\
            run provisioning ansible-playbook site.yml
+      - run: touch tmp/done

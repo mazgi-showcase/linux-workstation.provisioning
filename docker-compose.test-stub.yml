@@ -1,20 +1,50 @@
 version: "3.8"
+
+x-test-stub-base-service: &test-stub-base-service
+  build:
+    args: &test-stub-base-service-build-args
+      UID: ${UID:-0}
+      GID: ${GID:-0}
+  command:
+    - bash
+    - -lc
+    - |
+      rm -f /project/tmp/done
+      sudo chown $$(id -u):$$(id -g) $${HOME}/.ssh/
+      cat $${HOME}/.ssh/id_rsa.pub > $${HOME}/.ssh/authorized_keys
+      /project/scripts/sleep.sh
+  user: "${UID:-0}:${GID:-0}"
+  volumes: &test-stub-base-service-volumes
+    - ${HOME}/.ssh/id_rsa:/root/.ssh/id_rsa:ro # for macOS
+    - ${HOME}/.ssh/id_rsa.pub:/root/.ssh/id_rsa.pub:ro # for macOS
+    - ${HOME}/.ssh/id_rsa:/home/developer/.ssh/id_rsa:ro
+    - ${HOME}/.ssh/id_rsa.pub:/home/developer/.ssh/id_rsa.pub:ro
+    - ./scripts:/project/scripts
+    - ./tmp:/project/tmp
+  working_dir: /workspace
+
 services:
-  test-ubuntu-20:
+  test-debian-10:
+    <<: *test-stub-base-service
     build:
-      context: Dockerfile.d/test-stub-ubuntu-20
       args:
-        UID: ${UID:-0}
-        GID: ${GID:-0}
-    command:
-      - bash
-      - -lc
-      - |
-        rm -f /project/tmp/done
-        sudo chown $$(id -u):$$(id -g) $${HOME}/.ssh/
-        cat $${HOME}/.ssh/id_rsa.pub > $${HOME}/.ssh/authorized_keys
-        /project/scripts/sleep.sh
-    user: "${UID:-0}:${GID:-0}"
+        <<: *test-stub-base-service-build-args
+      context: Dockerfile.d/test-stub-debian-10
+    volumes:
+      - test-debian-10-home-root:/root # for macOS
+      - test-debian-10-home-developer:/home/developer
+      - ${HOME}/.ssh/id_rsa:/root/.ssh/id_rsa:ro # for macOS
+      - ${HOME}/.ssh/id_rsa.pub:/root/.ssh/id_rsa.pub:ro # for macOS
+      - ${HOME}/.ssh/id_rsa:/home/developer/.ssh/id_rsa:ro
+      - ${HOME}/.ssh/id_rsa.pub:/home/developer/.ssh/id_rsa.pub:ro
+      - ./scripts:/project/scripts
+      - ./tmp:/project/tmp
+  test-ubuntu-20:
+    <<: *test-stub-base-service
+    build:
+      args:
+        <<: *test-stub-base-service-build-args
+      context: Dockerfile.d/test-stub-ubuntu-20
     volumes:
       - test-ubuntu-20-home-root:/root # for macOS
       - test-ubuntu-20-home-developer:/home/developer
@@ -26,6 +56,10 @@ services:
       - ./tmp:/project/tmp
     working_dir: /workspace
 volumes:
+  test-debian-10-home-root:
+    driver: local
+  test-debian-10-home-developer:
+    driver: local
   test-ubuntu-20-home-root:
     driver: local
   test-ubuntu-20-home-developer:
