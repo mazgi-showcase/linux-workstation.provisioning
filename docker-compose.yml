@@ -6,11 +6,11 @@ services:
       args:
         UID: ${UID:-0}
         GID: ${GID:-0}
-    command:
-      - zsh
-      - -ic
-      - |
-        /project/scripts/provisioning.init-with-google.sh
+    # command:
+    #   - zsh
+    #   - -ic
+    #   - |
+    #     /project/scripts/provisioning.init-with-google.sh
     environment:
       - AWS_ACCESS_KEY_ID
       - AWS_ACCOUNT_ID
