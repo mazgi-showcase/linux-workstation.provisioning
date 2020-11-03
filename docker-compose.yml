@@ -1,16 +1,18 @@
-version: "3.7"
+version: "3.8"
 services:
   provisioning:
     build:
       context: Dockerfile.d/provisioning
       args:
-        UID: ${UID:-0}
+        DOCKER_GID: ${DOCKER_GID}
         GID: ${GID:-0}
+        UID: ${UID:-0}
     command:
       - zsh
       - -ic
       - |
-        ansible-galaxy install -r requirements.yml
+        echo ansible-galaxy install -r requirements.yml
+        ansible --module-name ping all
     environment:
       ANSIBLE_CONFIG: /project/config/${CURRENT_ENV_NAME}/ansible.cfg
       CURRENT_ENV_NAME:
@@ -20,9 +22,10 @@ services:
       - provisioning-home-developer:/home/developer
       - /var/run/docker.sock:/var/run/docker.sock
       - ${HOME}/.ssh:/root/.ssh:ro # for macOS
-      - ${HOME}/.ssh:/developer/.ssh:ro
+      - ${HOME}/.ssh:/home/developer/.ssh:ro
       - ./config:/project/config
       - ./provisioning:/project/workspace
+      - ./tmp:/project/tmp
     working_dir: /project/workspace
 volumes:
   provisioning-home-root:

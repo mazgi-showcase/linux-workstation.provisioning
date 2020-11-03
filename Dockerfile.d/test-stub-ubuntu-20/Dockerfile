@@ -1,26 +1,27 @@
-FROM ghcr.io/mazgi/provisioning
+FROM ubuntu:20.04
 
 # Set in non-interactive mode.
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN :\
-  && apt-get install --assume-yes avahi-utils libnss-mdns
-
-ARG DOCKER_GID
 ARG GID=0
 ARG UID=0
-ENV DOCKER_GID=${DOCKER_GID}
 ENV GID=${GID:-0}
 ENV UID=${UID:-0}
 
-RUN :\
+RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-recommends\
+  && apt-get update\
+  # 
+  # Set up locales
+  && apt-get install --assume-yes locales procps dialog\
+  && echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen\
+  && locale-gen\
+  #
+  # Install packages
+  && apt-get install --assume-yes ca-certificates curl openssh-server python3 sudo\
+  # 
   # Create a user for development who has the same UID and GID as you.
-  && groupadd --force --gid ${GID} developer || true\
-  && useradd --comment '' --create-home --gid users --groups developer --uid ${UID} developer\
-  # Append docker group
-  && bash -c "test -n \"${DOCKER_GID}\" && groupadd --gid ${DOCKER_GID} docker" || true\
-  && usermod --append --groups docker developer 2> /dev/null || true\
-  # Set sudo: (ALL) NOPASSWD: ALL
+  && addgroup --gid ${GID} developer || true\
+  && adduser --disabled-password --uid ${UID} --gecos '' --gid ${GID} developer || true\
   && echo '%users ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-users\
   && echo '%developer ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-developer
 

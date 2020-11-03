@@ -1,2 +1,2 @@
 - name: whoami in the role
-  shell: whoami
+  raw: whoami

@@ -6,7 +6,7 @@
   #     prompt: "iCloud user id"
   tasks:
     - name: whoami
-      shell: whoami
+      raw: whoami
   roles:
     # - role: mazgi.1password_cli
     # - role: mazgi.cargo_make

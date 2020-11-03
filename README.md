@@ -9,8 +9,9 @@ You need create the `.env` file as follows.
 ```shellsession
 rm -f .env
 test $(uname -s) = 'Linux' && echo "UID=$(id -u)\nGID=$(id -g)" >> .env
-cat<<EOE > .env
+cat<<EOE >> .env
 CURRENT_ENV_NAME=production
+DOCKER_GID=$(getent group docker | cut -d : -f 3)
 EOE
 ```
 
@@ -20,9 +21,17 @@ You need create the `config/production/inventory/hosts.yml` file like follows.
 all:
   children:
     workstations:
-      hosts:
-        your-host-1.local:
-          ansible_user: mazgi
+      children:
+        managedByAd:
+          vars:
+            ansible_user: hidenori.matsuki
+          hosts:
+            your-mac.local:
+        unmanaged:
+          vars:
+            ansible_user: mazgi
+          hosts:
+            octomore.local:
 ```
 
 ## How to run
@@ -36,6 +45,22 @@ docker-compose up
 ```shellsession
 docker-compose run provisioning ansible --module-name ping all
 docker-compose run provisioning ansible-playbook --ask-become-pass site.yml
+```
+
+## How to test
+
+```shellsession
+docker-compose --env-file .test.env --file docker-compose.yml --file docker-compose.test-stub.yml build
+```
+
+```shellsession
+docker-compose --env-file .test.env --file docker-compose.test-stub.yml up --detach
+docker-compose --env-file .test.env --file docker-compose.yml up
+docker-compose --env-file .test.env --file docker-compose.yml run provisioning ansible-playbook site.yml
+```
+
+```shellsession
+docker-compose --env-file .test.env --file docker-compose.yml --file docker-compose.test-stub.yml down -v
 ```
 
 ## Links
