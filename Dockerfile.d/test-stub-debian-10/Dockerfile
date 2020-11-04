@@ -20,8 +20,8 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
   && apt-get install --assume-yes ca-certificates curl openssh-server python3 sudo\
   # 
   # Create a user for development who has the same UID and GID as you.
-  && addgroup --gid ${GID} developer || true\
-  && adduser --disabled-password --uid ${UID} --gecos '' --gid ${GID} developer || true\
+  && groupadd --force --gid ${GID} developer || true\
+  && useradd --comment '' --create-home --gid users --groups developer --uid ${UID} developer\
   && echo '%users ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-users\
   && echo '%developer ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-developer
 
