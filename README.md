@@ -50,17 +50,16 @@ docker-compose run provisioning ansible-playbook --ask-become-pass site.yml
 ## How to test
 
 ```shellsession
-docker-compose --env-file .test.env --file docker-compose.yml --file docker-compose.test-stub.yml build
+docker-compose --env-file .test.env build
 ```
 
 ```shellsession
-docker-compose --env-file .test.env --file docker-compose.test-stub.yml up --detach
-docker-compose --env-file .test.env --file docker-compose.yml up
-docker-compose --env-file .test.env --file docker-compose.yml run provisioning ansible-playbook site.yml
+docker-compose --env-file .test.env up
+docker-compose --env-file .test.env run provisioning ansible-playbook site.yml
 ```
 
 ```shellsession
-docker-compose --env-file .test.env --file docker-compose.yml --file docker-compose.test-stub.yml down -v
+docker-compose --env-file .test.env down -v
 ```
 
 ## Links

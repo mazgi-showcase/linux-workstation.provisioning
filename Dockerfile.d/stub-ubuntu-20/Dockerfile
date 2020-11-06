@@ -1,11 +1,11 @@
-FROM debian:10
+FROM ubuntu:20.04
 
 # Set in non-interactive mode.
 ENV DEBIAN_FRONTEND=noninteractive
 
 ARG GID=0
-ARG UID=0
 ENV GID=${GID:-0}
+ARG UID=0
 ENV UID=${UID:-0}
 
 RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-recommends\

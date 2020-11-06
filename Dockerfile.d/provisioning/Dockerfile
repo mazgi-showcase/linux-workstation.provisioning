@@ -7,10 +7,10 @@ RUN :\
   && apt-get install --assume-yes avahi-utils libnss-mdns
 
 ARG DOCKER_GID
-ARG GID=0
-ARG UID=0
 ENV DOCKER_GID=${DOCKER_GID}
+ARG GID=0
 ENV GID=${GID:-0}
+ARG UID=0
 ENV UID=${UID:-0}
 
 RUN :\

@@ -9,39 +9,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: |
-          cat<<EOE > .test.env
+          cat<<EOE > .env
           CURRENT_ENV_NAME=test
           EOE
       - run: |
-          echo "UID=$(id -u)" >> .test.env
-          echo "GID=$(id -g)" >> .test.env
+          echo "UID=$(id -u)" >> .env
+          echo "GID=$(id -g)" >> .env
+          echo "DOCKER_GID=$(getent group docker | cut -d : -f 3)" >> .env
       - name: set up ssh credentials for testing
         run: |
           mkdir -p ${HOME}/.ssh/
-          ssh-keygen -C '' -f ${HOME}/.ssh/id_rsa -N ''
-      - name: docker-compose build
-        run: |
-          docker-compose\
-           --env-file .test.env\
-           --file docker-compose.yml\
-           --file docker-compose.test-stub.yml\
-           build
-      - name: (test-stub) docker-compose up
-        run: |
-          docker-compose\
-           --env-file .test.env\
-           --file docker-compose.test-stub.yml\
-           up --detach
-      - name: docker-compose up
-        run: |
-          docker-compose\
-           --env-file .test.env\
-           --file docker-compose.yml\
-           up
-      - name: docker-compose run
-        run: |
-          docker-compose\
-           --env-file .test.env\
-           --file docker-compose.yml\
-           run provisioning ansible-playbook site.yml
-      - run: touch tmp/done
+          ssh-keygen -C '' -f ${HOME}/.ssh/id_rsa -N '' -q
+      - run: cp scripts/run{.ci,}.sh
+      - run: docker-compose build
+      - run: docker-compose up
+      - run: docker-compose down -v

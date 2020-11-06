@@ -1,8 +1,9 @@
-FROM ghcr.io/mazgi/gentoo
+# FROM ghcr.io/mazgi/gentoo
+FROM gentoo/stage3 
 
 ARG GID=0
-ARG UID=0
 ENV GID=${GID:-0}
+ARG UID=0
 ENV UID=${UID:-0}
 
 # Sync the gentoo repository
