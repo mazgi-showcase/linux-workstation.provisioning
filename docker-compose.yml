@@ -34,7 +34,7 @@ services:
       - |
         ansible-galaxy install -r requirements.yml
         ansible --module-name ping all
-        /project/scripts/run.sh
+        /project/scripts/$${CURRENT_ENV_NAME}/run.sh
     environment:
       ANSIBLE_CONFIG: /project/config/${CURRENT_ENV_NAME}/ansible.cfg
       CURRENT_ENV_NAME:
