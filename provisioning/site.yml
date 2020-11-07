@@ -8,7 +8,7 @@
     - name: whoami
       raw: whoami
   roles:
-    # - role: mazgi.1password_cli
+    # - role: mazgi.onepassword_cli
     # - role: mazgi.cargo_make
     #   become: true
     - role: workstation_system
