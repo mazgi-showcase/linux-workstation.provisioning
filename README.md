@@ -1,6 +1,6 @@
-# workstation.provisioning
+# linux-workstation.provisioning
 
-[![default](https://github.com/mazgi/workstation.provisioning/workflows/default/badge.svg)](https://github.com/mazgi/workstation.provisioning/actions?query=workflow%3Adefault)
+[![default](https://github.com/mazgi/linux-workstation.provisioning/workflows/default/badge.svg)](https://github.com/mazgi/linux-workstation.provisioning/actions?query=workflow%3Adefault)
 
 ## How to set up
 
