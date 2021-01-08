@@ -1,5 +1,4 @@
-# FROM ghcr.io/mazgi/gentoo
-FROM gentoo/stage3 
+FROM ghcr.io/mazgi/gentoo
 
 ARG GID=0
 ENV GID=${GID:-0}
