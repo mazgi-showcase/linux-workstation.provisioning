@@ -38,6 +38,7 @@ services:
     environment:
       ANSIBLE_CONFIG: /project/config/${CURRENT_ENV_NAME}/ansible.cfg
       CURRENT_ENV_NAME:
+    network_mode: "host"
     user: "${UID:-0}:${GID:-0}"
     volumes:
       - provisioning-home-root:/root # for macOS

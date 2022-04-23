@@ -18,7 +18,7 @@ RUN emerge -uNDvq --buildpkg --usepkg\
 RUN :\
   # Create a user for development who has the same UID and GID as you.
   && groupadd --force --gid ${GID} developer || true\
-  && useradd --comment '' --create-home --gid users --groups developer --uid ${UID} developer\
+  && useradd --comment '' --create-home --gid users --groups developer --uid ${UID} developer || true\
   && echo '%users ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-users\
   && echo '%developer ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-developer
 
