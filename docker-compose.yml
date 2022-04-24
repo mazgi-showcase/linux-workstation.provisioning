@@ -17,7 +17,7 @@ x-service-stub-base: &service-stub-base
     - ${HOME}/.ssh/id_rsa:/home/developer/.ssh/id_rsa:ro
     - ${HOME}/.ssh/id_rsa.pub:/home/developer/.ssh/id_rsa.pub:ro
     - ./scripts:/project/scripts
-    - ./tmp:/project/tmp
+    - ./tmp:/tmp
   working_dir: /workspace
 
 services:
@@ -38,7 +38,7 @@ services:
     environment:
       ANSIBLE_CONFIG: /project/config/${CURRENT_ENV_NAME}/ansible.cfg
       CURRENT_ENV_NAME:
-    network_mode: "host"
+    # network_mode: "host"
     user: "${UID:-0}:${GID:-0}"
     volumes:
       - provisioning-home-root:/root # for macOS
@@ -57,12 +57,12 @@ services:
       args:
         <<: *service-stub-base-build-args
       context: Dockerfile.d/stub-debian-10
-  stub-gentoo:
-    <<: *service-stub-base
-    build:
-      args:
-        <<: *service-stub-base-build-args
-      context: Dockerfile.d/stub-gentoo
+  # stub-gentoo:
+  #   <<: *service-stub-base
+  #   build:
+  #     args:
+  #       <<: *service-stub-base-build-args
+  #     context: Dockerfile.d/stub-gentoo
   stub-ubuntu-20:
     <<: *service-stub-base
     build:

@@ -1,6 +1,19 @@
 # - name: whoami in the role
 #   raw: whoami
 
+- name: Set up wheel group on Debian and Ubuntu
+  block:
+    - name: Uncomment the wheel line in /etc/pam.d/su
+      lineinfile:
+        dest: /etc/pam.d/su
+        regexp: '^\s*#\s+auth\s+sufficient\s+pam_wheel.so\s+trust\s*$'
+        line: "auth       sufficient pam_wheel.so trust"
+    - name: Create the wheel group
+      ansible.builtin.group:
+        name: wheel
+        system: true
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
 - name: Create the user
   ansible.builtin.user:
     name: "{{ default_user_name }}"
