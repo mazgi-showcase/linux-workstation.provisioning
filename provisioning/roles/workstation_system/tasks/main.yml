@@ -1,2 +1,11 @@
-- name: whoami in the role
-  raw: whoami
+# - name: whoami in the role
+#   raw: whoami
+
+- name: Create the user
+  ansible.builtin.user:
+    name: "{{ default_user_name }}"
+    uid: "{{ default_user_uid }}"
+    shell: /bin/zsh
+    group: users
+    groups: docker,wheel
+    generate_ssh_key: true

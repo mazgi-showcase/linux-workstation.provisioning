@@ -1,18 +1,24 @@
 ---
 - name: set up workstations
   hosts: workstations
-  # vars_prompt:
-  #   - name: apple_icloud_user_id
-  #     prompt: "iCloud user id"
-  tasks:
-    - name: whoami
-      raw: whoami
+  vars:
+    default_user_name: "{{ default_user_name }}"
+    default_user_uid: "{{ default_user_uid }}"
+  vars_prompt:
+    - name: default_user_name
+      default: user
+      private: no
+      prompt: "Please type the main user name"
+    - name: default_user_uid
+      default: 12345
+      private: no
+      prompt: "Please type the main user UID"
+  # tasks:
+  #   - name: whoami
+  #     raw: whoami
   roles:
     # - role: mazgi.onepassword_cli
     # - role: mazgi.cargo_make
     #   become: true
     - role: workstation_system
-      # environment:
-      #   apple_icloud_user_id: "{{ apple_icloud_user_id }}"
-      #   apple_icloud_user_password: "{{ apple_icloud_user_password }}"
       become: true
