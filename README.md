@@ -44,6 +44,7 @@ docker-compose up
 
 ```shellsession
 docker-compose run provisioning ansible --module-name ping all
+docker-compose run provisioning ansible --module-name shell --arg 'echo hi' --inventory 192.168.0.1, all
 docker-compose run provisioning ansible-playbook --ask-become-pass site.yml
 ```
 
@@ -65,3 +66,4 @@ docker-compose --env-file .test.env down -v
 ## Links
 
 - https://docs.ansible.com/ansible/latest/reference_appendices/config.html#the-configuration-file
+- https://github.com/mazgi/ansible-galaxy.gentoo-systemd-remote
