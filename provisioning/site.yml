@@ -17,7 +17,7 @@
     # - role: mazgi.onepassword_cli
     # - role: mazgi.cargo_make
     #   become: true
-    # - role: workstation_system
+    - role: workstation_system
     - role: workstation_user
       become_user: "{{ default_user_name }}"
       become: true
