@@ -20,7 +20,6 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
   && apt-get install --assume-yes\
   apt-utils curl dnsutils git jq openssh-client sudo tmux unzip vim zsh\
   build-essential\
-  cargo\
   iputils-ping netcat\
   apt-transport-https ca-certificates curl gnupg gnupg2 rsync software-properties-common\
   avahi-utils libnss-mdns\
