@@ -22,5 +22,5 @@ jobs:
           mkdir -p ${HOME}/.ssh/
           ssh-keygen -C '' -f ${HOME}/.ssh/id_rsa -N '' -q
       - run: docker-compose build
-      - run: docker-compose up
-      - run: docker-compose down -v
+      # - run: docker-compose up
+      # - run: docker-compose down -v
