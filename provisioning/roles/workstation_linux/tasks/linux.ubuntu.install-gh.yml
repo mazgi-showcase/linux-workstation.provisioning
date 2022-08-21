@@ -1,0 +1,17 @@
+# See https://github.com/cli/cli/blob/trunk/docs/install_linux.md
+- name: Install GitHub CLI
+  become: True
+  block:
+    - name: Add the GPG key
+      ansible.builtin.apt_key:
+        url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+        keyring: /etc/apt/keyrings/github-cli.gpg
+    - name: Add the APT repository
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/etc/apt/keyrings/github-cli.gpg] https://cli.github.com/packages stable main"
+        filename: github-cli
+    - name: Install packages
+      ansible.builtin.apt:
+        name:
+          - gh
+        update_cache: yes

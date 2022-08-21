@@ -1,11 +1,29 @@
-# Packages
-- name: Install Packages - Gentoo
-  import_tasks: linux.gentoo.packages.yml
+# Gentoo
+- name: Gentoo
+  block:
+    - name: Apply templates for Packages
+      become: True
+      template:
+        src: "{{ item.src }}"
+        dest: "/{{ item.path | regex_replace('\\.j2$', '') }}"
+      when: item.state == 'file'
+      with_filetree: "{{ role_path }}/templates/linux.gentoo"
+    - import_tasks: linux.gentoo.packages.yml
   when:
     - ansible_facts.system == "Linux"
     - ansible_facts.distribution == 'Gentoo'
-- name: Install Packages - Ubuntu
-  import_tasks: linux.ubuntu.packages.yml
+
+# Ubuntu
+- name: Ubuntu
+  block:
+    - import_tasks: linux.ubuntu.packages.yml
+    - import_tasks: linux.ubuntu.install-docker.yml
+    - import_tasks: linux.ubuntu.install-gh.yml
+    - import_tasks: linux.ubuntu.install-starship.yml
   when:
     - ansible_facts.system == "Linux"
     - ansible_facts.distribution == 'Ubuntu'
+
+# Shell Environments
+- name: Set up the Shell Environments
+  import_tasks: linux.shell-environments.yml

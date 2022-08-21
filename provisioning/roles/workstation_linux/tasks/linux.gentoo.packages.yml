@@ -1,5 +1,12 @@
-- name: Install Packages
+- name: Install Packages using Gentoo Portage
   become: True
   community.general.packaging.os.portage:
     name:
-      - zsh
+      - app-containers/docker
+      - app-containers/docker-cli
+      - app-containers/docker-compose
+      - app-misc/tmux
+      - app-shells/starship
+      - app-shells/zsh
+      - dev-util/github-cli
+      - dev-vcs/git

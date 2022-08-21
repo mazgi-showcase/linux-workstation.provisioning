@@ -1,0 +1,93 @@
+- name: Gather commands that exist on the host
+  block:
+    - shell: bash -lc "which {{ item }}"
+      register: _has_commands
+      check_mode: False
+      failed_when: False
+      changed_when: False
+      with_items:
+        - aws_completer
+        - terraform
+        - starship
+    # - debug:
+    #     var: _has_commands
+    - set_fact:
+        commands: |
+          {% set _dict = {} %}
+          {% for ret in _has_commands.results %}
+          {%   if ret.rc == 0 %}
+          {%     set _ = _dict.update({ret.item:ret.rc}) %}
+          {%   endif %}
+          {% endfor %}
+          {{ _dict }}
+      check_mode: False
+    # - debug:
+    #     var: commands
+
+- name: Create the working directory
+  file:
+    path: "{{ ansible_env.HOME }}/Creations/"
+    state: directory
+    mode: "0700"
+
+- name: Configure the ~/.gitconfig
+  community.general.source_control.git_config:
+    scope: global
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+  with_items: "{{ git_config_list }}"
+
+- name: Define variables for dotfiles
+  set_fact:
+    dotfiles_modes:
+      .zshrc.j2: "0600"
+  check_mode: False
+- name: dotfiles
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ ansible_env.HOME }}/{{ item.path | regex_replace('\\.j2$', '') }}"
+    mode: "{{ dotfiles_modes[item.src] | default('0600') }}"
+  when: item.state == 'file'
+  with_filetree: "{{ role_path }}/templates/~"
+
+# See also https://zsh.sourceforge.io/Doc/Release/index.html
+- name: Set up Z-shell
+  block:
+    - name: Create the cache directory for zsh
+      file:
+        path: "{{ ansible_env.HOME }}/.cache/zsh/"
+        state: directory
+        mode: "0700"
+        recurse: True
+
+# See also https://github.com/tmux/tmux
+- name: Set up tmux
+  block:
+    # See also https://github.com/tmux-plugins/tpm
+    - name: Clone the tpm repository
+      git:
+        repo: https://github.com/tmux-plugins/tpm
+        dest: "{{ ansible_env.HOME }}/.tmux/plugins/tpm"
+
+- name: Set up Vim
+  block:
+    - name: Create Vim plugin directories
+      file:
+        path: "{{ ansible_env.HOME }}/.vim/autoload/"
+        state: directory
+        mode: "0700"
+        recurse: True
+    # https://github.com/junegunn/vim-plug
+    - name: Download vim-plug
+      get_url:
+        url: https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        dest: "{{ ansible_env.HOME }}/.vim/autoload/plug.vim"
+    - name: Check status for Vim plugins
+      shell: |
+        vim +PlugStatus +qa
+      register: vim_plugin_status
+      # todo: detect "Not found."
+    # - debug: var=vim_plugin_status
+    - name: Install Vim plugins
+      shell: |
+        vim +'PlugInstall --sync' +qa

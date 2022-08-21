@@ -1,0 +1,23 @@
+- name: Install Starship
+  block:
+    - name: Create the Temporary Directory
+      tempfile:
+        state: directory
+      register: starship_install_script_tmpdir
+      check_mode: False
+      failed_when: False
+      changed_when: False
+    - name: Download Starship install script
+      get_url:
+        url: https://starship.rs/install.sh
+        dest: "{{ starship_install_script_tmpdir.path }}/install.sh"
+        mode: "0755"
+      check_mode: False
+      failed_when: False
+      changed_when: False
+    - name: Install Starship
+      become: True
+      shell:
+        cmd: "{{ starship_install_script_tmpdir.path }}/install.sh --yes"
+        executable: /bin/sh
+  when: "'starship' not in commands"

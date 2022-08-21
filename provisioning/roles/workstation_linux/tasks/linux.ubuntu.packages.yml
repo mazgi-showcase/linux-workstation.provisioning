@@ -1,4 +1,33 @@
-- name: Install Packages
+- name: Gather commands that exist on the host
+  block:
+    - shell: bash -lc "which {{ item }}"
+      register: _has_commands
+      check_mode: False
+      failed_when: False
+      changed_when: False
+      with_items:
+        - aws_completer
+        - terraform
+        - starship
+    # - debug:
+    #     var: _has_commands
+    - set_fact:
+        commands: |
+          {% set _dict = {} %}
+          {% for ret in _has_commands.results %}
+          {%   if ret.rc == 0 %}
+          {%     set _ = _dict.update({ret.item:ret.rc}) %}
+          {%   endif %}
+          {% endfor %}
+          {{ _dict }}
+      check_mode: False
+    # - debug:
+    #     var: commands
+
+- name: Install Packages using Ubuntu APT
+  become: True
   ansible.builtin.apt:
     name:
+      - git
+      - tmux
       - zsh
