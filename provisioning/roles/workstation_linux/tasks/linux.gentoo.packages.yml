@@ -1,0 +1,5 @@
+- name: Install Packages
+  become: True
+  community.general.packaging.os.portage:
+    name:
+      - zsh

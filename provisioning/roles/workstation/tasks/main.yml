@@ -1,0 +1,4 @@
+- name: Import Linux specific provisioning
+  import_role:
+    name: workstation_linux
+  when: ansible_facts.system == "Linux"

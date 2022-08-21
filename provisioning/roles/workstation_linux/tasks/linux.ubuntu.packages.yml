@@ -1,0 +1,4 @@
+- name: Install Packages
+  ansible.builtin.apt:
+    name:
+      - zsh

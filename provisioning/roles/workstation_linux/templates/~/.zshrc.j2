@@ -1,0 +1,76 @@
+# See http://zsh.sourceforge.net/Doc/Release/Zsh-Modules.html#The-zsh_002fzprof-Module
+# zmodload zsh/zprof
+
+export ZDOTDIR=${ZDOTDIR:-$HOME}
+export EDITOR=vim
+
+autoload -U bashcompinit; bashcompinit
+autoload -Uz compinit; compinit
+
+bindkey -e
+WORDCHARS='*'
+HISTFILE=${ZDOTDIR}/.cache/zsh/zsh-history
+HISTSIZE=999999
+SAVEHIST=999999
+setopt extended_history
+setopt hist_ignore_all_dups
+setopt hist_reduce_blanks
+setopt share_history
+
+# {0-2a-c} => 0 1 2 a b c
+setopt braceccl
+
+# correct: sl -> ls [nyae]?
+setopt correct
+
+# x#, x##, *sh~*.sh, ^*.ext
+setopt extended_glob
+
+# foo --bar=[TAB]
+setopt magic_equal_subst
+
+# $ cd -[TAB]
+# 0 -- ~/.dotfiles/a/b/c
+# 1 -- ~/.dotfiles/a/b
+# 2 -- ~/.dotfiles/a
+setopt auto_pushd
+setopt pushd_ignore_dups
+
+# mkdir -p foo/bar/baz
+# cd [ESC-.]
+autoload -Uz smart-insert-last-word
+zle -N insert-last-word smart-insert-last-word
+
+{% if ansible_os_family == 'Darwin' %}
+alias ls='ls -FG'
+{% else %}
+alias ls='ls -Fv --color'
+{% endif %}
+alias ll='ls -l'
+alias la='ls -a'
+alias -g G='| grep '
+alias -g M='| more '
+alias -g V='| vim -R -'
+
+{% if 'aws_completer' in commands %}
+# https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-completion.html#cli-command-completion-linux
+complete -C aws_completer aws
+{% endif %}
+{% if True %}
+if [[ -f /etc/bash_completion.d/azure-cli ]]; then
+  source /etc/bash_completion.d/azure-cli
+fi
+{% endif %}
+{% if True %}
+if [[ -f /usr/share/google-cloud-sdk/completion.zsh.inc ]]; then
+  source /usr/share/google-cloud-sdk/completion.zsh.inc
+fi
+{% endif %}
+{% if 'terraform' in commands %}
+# https://www.terraform.io/cli/commands#shell-tab-completion
+complete -C terraform terraform
+{% endif %}
+{% if 'starship' in commands %}
+eval "$(starship init zsh)"
+{% endif %}
+# zprof

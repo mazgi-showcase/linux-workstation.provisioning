@@ -1,77 +1,35 @@
-x-service-stub-base: &service-stub-base
+x-service-provisioning-base: &provisioning-base
   build:
-    args: &service-stub-base-build-args
-      UID: ${UID:-0}
+    args:
       GID: ${GID:-0}
+      UID: ${UID:-0}
+    context: Dockerfile.d/provisioning
   command:
-    - bash
-    - -lc
+    - zsh
+    - -ic
     - |
-      sudo chown $$(id -u):$$(id -g) $${HOME}/.ssh/
-      cat $${HOME}/.ssh/id_rsa.pub > $${HOME}/.ssh/authorized_keys
-      /project/scripts/sleep.sh
+      sleep infinity
+  environment:
+    ANSIBLE_CONFIG: /project/config/ansible.cfg
   user: "${UID:-0}:${GID:-0}"
-  volumes: &service-stub-base-volumes
-    - ${HOME}/.ssh/id_rsa:/root/.ssh/id_rsa:ro # for macOS
-    - ${HOME}/.ssh/id_rsa.pub:/root/.ssh/id_rsa.pub:ro # for macOS
-    - ${HOME}/.ssh/id_rsa:/home/developer/.ssh/id_rsa:ro
-    - ${HOME}/.ssh/id_rsa.pub:/home/developer/.ssh/id_rsa.pub:ro
+  volumes:
+    - provisioning-home-developer:/home/developer
+    - provisioning-home-root:/root # for macOS
+    - /var/run/docker.sock:/var/run/docker.sock
+    - ${HOME}/.ssh:/root/.ssh:ro # for macOS
+    - ${HOME}/.ssh:/home/developer/.ssh:ro
+    - ./config:/project/config
+    - ./provisioning:/project/workspace
     - ./scripts:/project/scripts
-    - ./tmp:/tmp
-  working_dir: /workspace
+    - ./tmp/provisioning:/tmp/provisioning
+  working_dir: /project/workspace
 
 services:
   provisioning:
-    build:
-      context: Dockerfile.d/provisioning
-      args:
-        DOCKER_GID: ${DOCKER_GID}
-        GID: ${GID:-0}
-        UID: ${UID:-0}
-    command:
-      - zsh
-      - -ic
-      - |
-        ansible-galaxy install -r requirements.yml
-        ansible --module-name ping all
-        /project/scripts/$${CURRENT_ENV_NAME}/run.sh
-    environment:
-      ANSIBLE_CONFIG: /project/config/${CURRENT_ENV_NAME}/ansible.cfg
-      CURRENT_ENV_NAME:
-    # network_mode: "host"
-    user: "${UID:-0}:${GID:-0}"
-    volumes:
-      - provisioning-home-root:/root # for macOS
-      - provisioning-home-developer:/home/developer
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ${HOME}/.ssh:/root/.ssh:ro # for macOS
-      - ${HOME}/.ssh:/home/developer/.ssh:ro
-      - ./config:/project/config
-      - ./provisioning:/project/workspace
-      - ./scripts:/project/scripts
-      - ./tmp:/project/tmp
-    working_dir: /project/workspace
-  stub-debian-10:
-    <<: *service-stub-base
-    build:
-      args:
-        <<: *service-stub-base-build-args
-      context: Dockerfile.d/stub-debian-10
-  # stub-gentoo:
-  #   <<: *service-stub-base
-  #   build:
-  #     args:
-  #       <<: *service-stub-base-build-args
-  #     context: Dockerfile.d/stub-gentoo
-  stub-ubuntu-20:
-    <<: *service-stub-base
-    build:
-      args:
-        <<: *service-stub-base-build-args
-      context: Dockerfile.d/stub-ubuntu-20
+    <<: *provisioning-base
 version: "3.8"
 volumes:
-  provisioning-home-root:
-    driver: local
   provisioning-home-developer:
+    driver: local
+  provisioning-home-root:
     driver: local

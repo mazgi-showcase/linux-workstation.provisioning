@@ -1,0 +1,11 @@
+ansible_user: user
+
+git_config_list:
+  - name: core.excludesfile
+    value: ~/.gitignore
+  - name: core.editor
+    value: vim
+  - name: user.name
+    value: Octocat
+  - name: user.email
+    value: octocat@github.com

@@ -1,0 +1,16 @@
+git_config_list:
+  - name: user.name
+    value: Octocat
+  - name: user.email
+    value: octocat@github.com
+
+specific_homebrew_packages:
+  - name: ffmpeg
+  - name: imagemagick
+
+specific_homebrew_cask_packages:
+  - name: adobe-creative-cloud
+
+specific_mas_packages:
+  - id: 803453959
+    _memo: Slack

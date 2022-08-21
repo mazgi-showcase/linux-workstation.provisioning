@@ -1,0 +1,45 @@
+- name: prepare
+  hosts: all
+  vars_prompt:
+    - name: user_password
+      prompt: Type the password for 'user'
+      private: True
+  tasks:
+    - name: Install Packages
+      become: True
+      ansible.builtin.package:
+        name:
+          - sudo
+          - zsh
+    - name: Store the zsh path
+      command: |
+        which zsh
+      register: zsh_path
+      check_mode: False
+      changed_when: False
+    - name: Create the wheel group
+      become: True
+      ansible.builtin.group:
+        name: wheel
+        system: True
+    - name: Create the user
+      become: True
+      user:
+        append: True
+        group: users
+        groups: wheel
+        name: user
+        password: "{{ user_password | password_hash('sha512') }}"
+        shell: "{{ zsh_path.stdout }}"
+        uid: "{{ 20000 | random(start=10000) }}"
+    - name: Add the group to sudoers
+      become: True
+      copy:
+        dest: /etc/sudoers.d/disable_sudo_password
+        content: |
+          %wheel ALL=(ALL:ALL) ALL
+    # - name: Get pubkeys from GitHub
+    #   become: True
+    #   authorized_key:
+    #     user: user
+    #     key: "{{ lookup('url', 'https://github.com/mazgi.keys', split_lines=False) }}"
