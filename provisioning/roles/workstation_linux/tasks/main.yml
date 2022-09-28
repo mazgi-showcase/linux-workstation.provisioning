@@ -24,6 +24,13 @@
     - ansible_facts.system == "Linux"
     - ansible_facts.distribution == 'Ubuntu'
 
+- name: Add the user to the groups
+  become: True
+  user:
+    append: True
+    groups: docker
+    name: "{{ ansible_user }}"
+
 # Shell Environments
 - name: Set up the Shell Environments
   import_tasks: linux.shell-environments.yml

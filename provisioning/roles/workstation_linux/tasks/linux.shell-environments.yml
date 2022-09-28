@@ -9,8 +9,6 @@
         - aws_completer
         - terraform
         - starship
-    # - debug:
-    #     var: _has_commands
     - set_fact:
         commands: |
           {% set _dict = {} %}
@@ -21,8 +19,6 @@
           {% endfor %}
           {{ _dict }}
       check_mode: False
-    # - debug:
-    #     var: commands
 
 - name: Create the working directory
   file:

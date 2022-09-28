@@ -10,3 +10,4 @@
       - app-shells/zsh
       - dev-util/github-cli
       - dev-vcs/git
+      - net-dns/avahi
